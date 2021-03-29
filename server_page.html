@@ -1,0 +1,194 @@
+<style>
+    #pb_t_main{
+        display:flex;
+        flex-direction:row;
+    }
+    #pb_t_main select{
+        width:200px;
+        height:30px;
+        margin-left:5px;
+    }
+    #pb_ta{
+        display:flex;
+        flex-direction:row;
+    }
+    #pb_tb{
+        display:flex;
+        flex-direction:row;
+    }
+    #pb_tm{
+        display:flex;
+        flex-direction:row;
+        margin-left:50px;
+        margin-right:50px;
+    }
+    .btn{
+        width:100px;
+        height:40px;
+        cursor:pointer;
+        margin-top:20px;
+        border:1px solid black;
+        background:#87bbdc;
+        color:white;
+    }
+    #gt{
+        width:200px;
+        height:30px;
+        margin-bottom:40px;
+    }
+    </style>
+    <body>
+        Game type<select id='gt' onchange='change_gt()'>
+            <option value='Bo1'>Bo1</option>
+            <option selected value='Bo3'>Bo3</option>
+            <option value='Bo5'>Bo5</option>
+        </select>
+        <div id='pb_t_main'>
+            <div id='pb_ta'>Team Left<select id='map_a_1' onchange='change_chs()'></select><select id='map_a_2' onchange='change_chs()'></select><select id='map_a_3' onchange='change_chs()'></select><select id='map_a_4' onchange='change_chs()'></select><select id='map_a_5' onchange='change_chs()'></select><select id='map_a_6' onchange='change_chs()'></select><select id='map_a_7' onchange='change_chs()'></select>Team Right</div>
+        </div>
+        <div class='btn' onclick='set_lobby();'>Accept</div>
+        <div class='btn' onclick='reload_lobby();'>Reload</div>
+    </body>
+    <script>
+       
+    let server_url = "http://127.0.0.1:8484";
+      
+    let maps=["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
+    let maps_buf = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
+    let chms = [];
+    
+    function change_gt(){
+        switch(document.getElementById('gt').value){
+            case 'Bo1':
+                document.getElementById('map_a_1').style='border:4px solid red';
+                document.getElementById('map_a_2').style='border:4px solid red';
+                document.getElementById('map_a_3').style='border:4px solid red';
+                document.getElementById('map_a_4').style='border:4px solid green';
+                document.getElementById('map_a_5').style='border:4px solid red';
+                document.getElementById('map_a_6').style='border:4px solid red';
+                document.getElementById('map_a_7').style='border:4px solid red';
+                break;
+            case 'Bo3':
+                document.getElementById('map_a_1').style='border:4px solid red';
+                document.getElementById('map_a_2').style='border:4px solid green';
+                document.getElementById('map_a_3').style='border:4px solid red';
+                document.getElementById('map_a_4').style='border:4px solid green';
+                document.getElementById('map_a_5').style='border:4px solid red';
+                document.getElementById('map_a_6').style='border:4px solid green';
+                document.getElementById('map_a_7').style='border:4px solid red';
+                break;
+            case 'Bo5':
+                document.getElementById('map_a_1').style='border:4px solid red';
+                document.getElementById('map_a_2').style='border:4px solid green';
+                document.getElementById('map_a_3').style='border:4px solid green';
+                document.getElementById('map_a_4').style='border:4px solid green';
+                document.getElementById('map_a_5').style='border:4px solid green';
+                document.getElementById('map_a_6').style='border:4px solid green';
+                document.getElementById('map_a_7').style='border:4px solid red';
+                break;
+        }
+    }
+    
+    async function reload_lobby(){
+        let post = new XMLHttpRequest();
+        post.open("POST", server_url, true) 
+        post.setRequestHeader("Content-Type", "application/json");
+        post.send("reload_lobby");
+        post.onreadystatechange = function() {
+            if (post.readyState == 4) {
+                if(post.status == 200) { 
+                    console.log(post.responseText)
+                    chms=[];
+                    document.getElementById('map_a_1').value=null;
+                    document.getElementById('map_a_2').value=null;
+                    document.getElementById('map_a_3').value=null;
+                    document.getElementById('map_a_4').value=null;
+                    document.getElementById('map_a_5').value=null;
+                    document.getElementById('map_a_6').value=null;
+                    document.getElementById('map_a_7').value=null;
+                }
+            }
+        }
+    }
+    
+    function change_chs(){
+        let num=0;
+        for(let i=0;i<7;i++){
+            if(document.getElementById('map_a_'+(i+1)).value){
+                chms[i] = document.getElementById('map_a_'+(i+1)).value;
+                num++;
+                for(let j=0;j<maps.length;j++){
+                    if(maps[j] == chms[i]){
+                        maps[j] = null;
+                    }
+                }
+            }
+        }
+        if(num==6){
+            for(let j=0;j<maps.length;j++){
+                if(maps[j]){
+                    document.getElementById('map_a_4').value = maps[j]
+                    chms[3]= maps[j];
+                }
+            }
+        }
+        maps = maps_buf;
+    }
+    
+    async function set_lobby(){
+        let gt = document.getElementById('gt').value
+        let post = new XMLHttpRequest();
+        post.open("POST", server_url,true) 
+        post.setRequestHeader("Content-Type", "application/json");
+        let request = {
+            maps: chms,
+            game_type: gt
+        }
+        post.send(JSON.stringify(request));
+        post.onreadystatechange = function() {
+            if (post.readyState == 4) {
+                if(post.status == 200) { 
+                    //console.log(post.responseText)
+                }
+            }
+        }
+    }
+    
+    function set_maps(){
+        for(let j=0;j<7;j++){
+            document.getElementById('map_a_'+(j+1)).innerHTML = null;
+            for(let i=0;i<maps.length;i++){
+                document.getElementById('map_a_'+(j+1)).innerHTML +="<option value='"+maps[i]+"'>"+maps[i]+"</option>";
+            }
+            document.getElementById('map_a_'+(j+1)).value=null
+        }
+    }
+    set_maps();
+    async function get_lobby(){
+        let post = new XMLHttpRequest();
+        post.open("POST", server_url, true) 
+        post.setRequestHeader("Content-Type", "application/json");
+        post.send("get_lobby_info");
+        post.onreadystatechange = function() {
+            if (post.readyState == 4) {
+                if(post.status == 200) { 
+                    let arr = post.responseText?JSON.parse(post.responseText):[];
+                    chms = arr.maps
+                    if(chms[0] || chms[5]){
+                        if(chms[0])document.getElementById('map_a_1').value=chms[0];
+                        if(chms[1])document.getElementById('map_a_2').value=chms[1];
+                        if(chms[2])document.getElementById('map_a_3').value=chms[2];
+                        if(chms[3])document.getElementById('map_a_4').value=chms[3];
+                        if(chms[4])document.getElementById('map_a_5').value=chms[4];
+                        if(chms[5])document.getElementById('map_a_6').value=chms[5];
+                        if(chms[6])document.getElementById('map_a_7').value=chms[6];
+                    }
+                    change_chs()
+                    document.getElementById('gt').value = arr.game_type;
+                    change_gt()
+                }
+            }
+        }
+    }
+    get_lobby();
+    </script>
