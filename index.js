@@ -47,7 +47,7 @@ server.createServer(async function(req, res){
         res.end();
     }
 }).listen(port_server,()=>{
-    console.log('http://127.0.0.1'+':'+port_server);
+    console.log('SERVER: http://127.0.0.1'+':'+port_server);
 });
 
 client.createServer(async function(req, res){
@@ -90,5 +90,5 @@ client.createServer(async function(req, res){
         }
     }
 }).listen(port_client,()=>{
-    console.log('http://127.0.0.1'+':'+port_client);
+    console.log('CLIENT http://127.0.0.1'+':'+port_client);
 });
