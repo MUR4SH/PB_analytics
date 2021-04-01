@@ -1,40 +1,32 @@
 const server_i = require("ws");
 const client_i = require("ws");
+const server_http = require("http");
+const client_http = require("http");
 const fs = require('fs');
-const port_client = 8080;
-const port_server = 8484;
+const port_client = 8484;
+const port_server = 8080;
 let html_s = fs.readFileSync('./server_page.html','utf-8')
 let html_c = fs.readFileSync('./client_page.html','utf-8')
 
 const server = new server_i.Server({port:port_server})
-const client = new client_i.Server({port:port_client})
 
-let response;
 let maps=[];
-var clients = {};
+var clients = [];
 let gt='Bo1';
 
 server.on('connection',(ws)=>{
     var id = Math.random();
     clients[id] = ws;
-    console.log("новое соединение " + id);
-    for (var key in clients) {
-        clients[key].send(html_s);
-    }
-  
+    let response;
     ws.on('message', function(message) {
-      console.log('получено сообщение ' + message);
-        let response;
-        if(message == 'get_lobby_info'){
-            response = {
-                game_type: gt,
-                maps: maps
-            }
-        }else{
+        if(message == 'reload_lobby'){
+            gt = 'Bo1'
+            maps = []
+        }else if(message != 'get_lobby_info'){
             try{
-                body = JSON.parse(body)
+                body = JSON.parse(message)
             }catch(err){
-                return;
+                body={}
             }
             if(body.game_type){
                 gt = body.game_type
@@ -43,77 +35,33 @@ server.on('connection',(ws)=>{
                 maps = body.maps
             }
         }
+        response = {
+            game_type: gt,
+            maps: maps
+        }
         for (var key in clients) {
-            clients[key].send(message);
+            clients[key].send(JSON.stringify(response));
         }
     });
-  
+    
     ws.on('close', function() {
-      console.log('соединение закрыто ' + id);
-      delete clients[id];
+        delete clients[id];
     });
 })
 
-client.on('connection',(ws)=>{
-    var id = Math.random();
-    clients[id] = ws;
-    console.log("новое соединение " + id);
-    for (var key in clients) {
-        clients[key].send(html_c);
-    }
-  
-    ws.on('message', function(message) {
-      console.log('получено сообщение ' + message);
-        let response;
-        if(message == 'get_lobby_info'){
-            response = {
-                game_type: gt,
-                maps: maps
-            }
-        }else{
-            try{
-                body = JSON.parse(body)
-            }catch(err){
-                return;
-            }
-            if(body.game_type){
-                gt = body.game_type
-            }
-            if(body.maps){
-                maps = body.maps
-            }
-        }
-        for (var key in clients) {
-            clients[key].send(message);
-        }
-    });
-  
-    ws.on('close', function() {
-      console.log('соединение закрыто ' + id);
-      delete clients[id];
-    });
-})
-/*
-client.createServer(async function(req, res){
-    if(req.method == "POST"){
-        let body='';
-        req.on('data', data => {
-            body += data;
-        });
-        req.on('end',() => {
-            res.writeHead(200);
-            if(body == 'get_lobby_info'){
-                response = {
-                    game_type: gt,
-                    maps: maps
-                }
-                res.write(JSON.stringify(response));
-            }
-            res.end();
-        });
-    }
+server_http.createServer(async function(req, res){
     if(req.method == "GET"){
-        console.log()
+        res.statusCode = 200;
+        res.setHeader('Content-type', 'text/html');
+        res.write(html_s)
+        res.end();
+    }
+}).listen('8181',()=>{
+    console.log('SERVER http://127.0.0.1'+':'+'8181');
+});
+
+client_http.createServer(async function(req, res){
+    if(req.method == "GET"){
         if(!req.url.match(/jpg/g)){
             res.write(html_c)
             res.end();
@@ -130,6 +78,6 @@ client.createServer(async function(req, res){
             res.end();
         }
     }
-}).listen(port_client,()=>{
-    console.log('CLIENT http://127.0.0.1'+':'+port_client);
-});*/
+}).listen('8383',()=>{
+    console.log('CLIENT http://127.0.0.1'+':'+'8383');
+});

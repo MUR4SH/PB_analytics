@@ -37,11 +37,12 @@
     </div>
 </body>
 <script>
-const socket = new WebSocket('ws://localhost:8080');
+var socket ;
+let url = 'ws://localhost:8080'
 let id=0;
 let maps=[];
 let buf=[];
-let gt='Bo1';
+let gt='';
 let check = false;
 
 function start(){
@@ -67,96 +68,93 @@ function maps_check(arr_maps){
     return (real == nr)
 }
 
-function get_websocket(){
-    socket.send("get_lobby_info");
-}
 
-socket.onmessage = (event)=>{
+
+function reconnect(){
+    socket = new WebSocket(url);
+    socket.onclose = function(){
+        setTimeout(function(){reconnect(url)}, 1000);
+    };
+    socket.onerror  = ()=>{
+        setTimeout(function(){reconnect(url)}, 1000);
+    }
+    socket.onopen = ()=>{
+        socket.send("get_lobby_info");
+    }
+    socket.onmessage = (event)=>{
         let message = event.data;
         let arr = message?JSON.parse(message):[];
-                if(arr){
-                    if(!arr.maps){
-                        maps = [];
-                        if(check) start();
-                        check = false;
-                    }else{
-                        if(maps_check(arr.maps) && (gt == arr.game_type)){
-                            check = true;
-                            return
+        if(arr){
+            if(!arr.maps){
+                maps = [];
+            }else{
+                maps = arr.maps;
+            }
+        }else{
+            maps = [];
+        }
+        gt = arr.game_type;
+        switch(gt){
+            case 'Bo1':
+                for(let i=0;i<maps.length;i++){
+                    if(maps[i]){
+                        document.getElementById((i+1)+'_obs').style='opacity:1;';
+                        if(i!=3){
+                            document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
                         }else{
-                            maps = arr.maps;
+                            document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
                         }
-                        check = true;
-                    }
-                }else{
-                    maps = [];
-                    if(check)start();
-                    check = false;
-                }
-                //start();
-                if(!arr){return;}
-                gt = arr.game_type;
-                switch(gt){
-                    case 'Bo1':
-                        for(let i=0;i<maps.length;i++){
-                            if(maps[i]){
-                                document.getElementById((i+1)+'_obs').style='opacity:1;';
-                                if(i!=3){
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }else{
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }
-                                document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
-                                document.getElementById((i+1)+'_obs_span').innerText = maps[i];
-                                document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
-                            }
-                        }
-                        break;
-                    case 'Bo3':
-                        for(let i=0;i<maps.length;i++){
-                            if(maps[i] != buf[i]){
-                                document.getElementById((i+1)+'_obs').style='opacity:1;';
-                                if(i==0 || i==2 || i==4 || i==6){
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }else{
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }
-                                document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
-                                document.getElementById((i+1)+'_obs_span').innerText = maps[i];
-                                document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
-                            }
-                        }
-                        break;
-                    case 'Bo5':
-                        for(let i=0;i<maps.length;i++){
-                            if(maps[i]){
-                                document.getElementById((i+1)+'_obs').style='opacity:1;';
-                                if(i==0 || i==6){
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }else{
-                                    document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
-                                }
-                                document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
-                                document.getElementById((i+1)+'_obs_span').innerText = maps[i];
-                                document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
-                            }
-                        }
-                        break;
-                }
-                if(maps.length==0){
-                    buf = maps;
-                }
-                if(maps.length!=buf.length){
-                    for(let i=0;i<maps.length;i++){
-                        buf[i]=maps[i];
+                        document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
+                        document.getElementById((i+1)+'_obs_span').innerText = maps[i];
+                        document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
                     }
                 }
+                break;
+            case 'Bo3':
+                for(let i=0;i<maps.length;i++){
+                    if(maps[i]){
+                        document.getElementById((i+1)+'_obs').style='opacity:1;';
+                        if(i==0 || i==2 || i==4 || i==6){
+                            document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
+                        }else{
+                            document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
+                        }
+                        document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
+                        document.getElementById((i+1)+'_obs_span').innerText = maps[i];
+                        document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
+                    }
+                }
+                break;
+            case 'Bo5':
+                for(let i=0;i<maps.length;i++){
+                    if(maps[i]){
+                        document.getElementById((i+1)+'_obs').style='opacity:1;';
+                        if(i==0 || i==6){
+                            document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, #FC5500 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
+                        }else{
+                                document.getElementById((i+1)+'_obs_span').style='background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%); opacity: 1';
+                        }
+                        document.getElementById((i+1)+'_obs').src = "../maps/"+maps[i]+".map.jpg";
+                        document.getElementById((i+1)+'_obs_span').innerText = maps[i];
+                        document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 1s;';
+                    }
+                }
+            break;
+        }
+        if(maps.length==0){
+            buf = maps;
+            for(let i=0;i<7;i++){
+                document.getElementById((i+1)+'_obs').style='opacity:0;';
+                document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,90deg); transition: transform 0s;';
+            }
+        }
+        if(maps.length!=buf.length){
+            for(let i=0;i<maps.length;i++){
+                buf[i]=maps[i];
+            }
+        }
     }
-
-//get_lobby()
-get_websocket()
-setInterval(()=>{
-    get_websocket()
-},1000)
+}
+reconnect()
 </script>
 </html>
