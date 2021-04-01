@@ -50,10 +50,9 @@
         <div class='btn' onclick='reload_lobby();'>Reload</div>
     </body>
     <script>
-       
-    let server_url = "http://127.0.0.1:8484";
+    var socket = new WebSocket("ws://localhost:8484");
       
-    let maps=["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
+    let maps = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
     let maps_buf = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
     let chms = [];
     
@@ -90,25 +89,16 @@
     }
     
     async function reload_lobby(){
-        let post = new XMLHttpRequest();
-        post.open("POST", server_url, true) 
-        post.setRequestHeader("Content-Type", "application/json");
-        post.send("reload_lobby");
-        post.onreadystatechange = function() {
-            if (post.readyState == 4) {
-                if(post.status == 200) { 
-                    console.log(post.responseText)
-                    chms=[];
-                    document.getElementById('map_a_1').value=null;
-                    document.getElementById('map_a_2').value=null;
+        socket.send("reload_lobby").then(()=>{
+            chms=[];
+            document.getElementById('map_a_1').value=null;
+            document.getElementById('map_a_2').value=null;
                     document.getElementById('map_a_3').value=null;
                     document.getElementById('map_a_4').value=null;
                     document.getElementById('map_a_5').value=null;
                     document.getElementById('map_a_6').value=null;
                     document.getElementById('map_a_7').value=null;
-                }
-            }
-        }
+        })
     }
     
     function change_chs(){
@@ -137,21 +127,11 @@
     
     async function set_lobby(){
         let gt = document.getElementById('gt').value
-        let post = new XMLHttpRequest();
-        post.open("POST", server_url,true) 
-        post.setRequestHeader("Content-Type", "application/json");
         let request = {
             maps: chms,
             game_type: gt
         }
-        post.send(JSON.stringify(request));
-        post.onreadystatechange = function() {
-            if (post.readyState == 4) {
-                if(post.status == 200) { 
-                    //console.log(post.responseText)
-                }
-            }
-        }
+        socket.send(JSON.stringify(request))
     }
     
     function set_maps(){
@@ -165,6 +145,7 @@
     }
     set_maps();
     async function get_lobby(){
+        socket.send("get_lobby_info");  
         let post = new XMLHttpRequest();
         post.open("POST", server_url, true) 
         post.setRequestHeader("Content-Type", "application/json");
@@ -190,5 +171,24 @@
             }
         }
     }
+
+    socket.onmessage = (event)=>{
+        let message = event.data;
+        let arr = message?JSON.parse(message):[];
+                    chms = arr.maps
+                    if(chms[0] || chms[5]){
+                        if(chms[0])document.getElementById('map_a_1').value=chms[0];
+                        if(chms[1])document.getElementById('map_a_2').value=chms[1];
+                        if(chms[2])document.getElementById('map_a_3').value=chms[2];
+                        if(chms[3])document.getElementById('map_a_4').value=chms[3];
+                        if(chms[4])document.getElementById('map_a_5').value=chms[4];
+                        if(chms[5])document.getElementById('map_a_6').value=chms[5];
+                        if(chms[6])document.getElementById('map_a_7').value=chms[6];
+                    }
+                    change_chs()
+                    document.getElementById('gt').value = arr.game_type;
+                    change_gt()
+    }
+
     get_lobby();
     </script>

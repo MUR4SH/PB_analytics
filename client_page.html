@@ -37,7 +37,7 @@
     </div>
 </body>
 <script>
-let client_url = 'http://127.0.0.1:8080'
+const socket = new WebSocket('ws://localhost:8080');
 let id=0;
 let maps=[];
 let buf=[];
@@ -67,15 +67,13 @@ function maps_check(arr_maps){
     return (real == nr)
 }
 
-async function get_lobby(){
-    let post = new XMLHttpRequest();
-    post.open("POST", client_url, true) 
-    post.setRequestHeader("Content-Type", "application/json");
-    post.send("get_lobby_info");
-    post.onreadystatechange = function() {
-        if (post.readyState == 4) {
-            if(post.status == 200) { 
-                let arr = post.responseText?JSON.parse(post.responseText):[];
+function get_websocket(){
+    socket.send("get_lobby_info");
+}
+
+socket.onmessage = (event)=>{
+        let message = event.data;
+        let arr = message?JSON.parse(message):[];
                 if(arr){
                     if(!arr.maps){
                         maps = [];
@@ -153,13 +151,12 @@ async function get_lobby(){
                         buf[i]=maps[i];
                     }
                 }
-            }
-        }
     }
-}
-get_lobby()
+
+//get_lobby()
+get_websocket()
 setInterval(()=>{
-    get_lobby()
+    get_websocket()
 },1000)
 </script>
 </html>
