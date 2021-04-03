@@ -1,14 +1,11 @@
 const server_i = require("ws");
-const client_i = require("ws");
 const server_http = require("http");
 const client_http = require("http");
 const fs = require('fs');
-const port_client = 8484;
-const port_server = 8080;
 let html_s = fs.readFileSync('./server_page.html','utf-8')
 let html_c = fs.readFileSync('./client_page.html','utf-8')
 
-const server = new server_i.Server({port:port_server})
+const server = new server_i.Server({port:8080})
 
 let maps=[];
 var clients = [];
@@ -18,6 +15,7 @@ server.on('connection',(ws)=>{
     var id = Math.random();
     clients[id] = ws;
     let response;
+    console.log('new client')
     ws.on('message', function(message) {
         if(message == 'reload_lobby'){
             gt = 'Bo1'
@@ -62,7 +60,7 @@ server_http.createServer(async function(req, res){
 
 client_http.createServer(async function(req, res){
     if(req.method == "GET"){
-        if(!req.url.match(/jpg/g)){
+        if(!req.url.match(/.[A-Za-z]+$/g)[0]){
             res.write(html_c)
             res.end();
         }else{
@@ -70,7 +68,10 @@ client_http.createServer(async function(req, res){
             let photo;
             try{
                 photo = fs.readFileSync(url_photo)
-                res.writeHead(200, {'Content-Type': 'image/jpg'});
+                let photo_type='jpg';
+                console.log(req.url)
+                photo_type = req.url.match(/.[A-Za-z]+$/g)[0].replace('.','')
+                res.writeHead(200, {'Content-Type': `image/${photo_type}`});
                 res.write(photo);
             }catch(err){
                 res.writeHead(404);

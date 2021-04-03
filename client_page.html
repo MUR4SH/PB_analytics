@@ -38,7 +38,7 @@
 </body>
 <script>
 var socket ;
-let url = 'ws://localhost:8080'
+let url = 'ws://'+window.location.origin.replace('http://','').replace('https://','').replace(/\:\d+$/g,':8080')
 let id=0;
 let maps=[];
 let buf=[];

@@ -50,7 +50,7 @@
         <div class='btn' onclick='reload_lobby();'>Reload</div>
     </body>
     <script>
-    let url = "ws://localhost:8080"
+    let url = 'ws://'+window.location.origin.replace('http://','').replace('https://','').replace(/\:\d+$/g,':8080')
     var socket
     
     let maps = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
