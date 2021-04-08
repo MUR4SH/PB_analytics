@@ -60,7 +60,7 @@ server_http.createServer(async function(req, res){
 
 client_http.createServer(async function(req, res){
     if(req.method == "GET"){
-        if(!req.url.match(/.[A-Za-z]+$/g)[0]){
+        if(!req.url.match(/.[A-Za-z]+$/g)){
             res.write(html_c)
             res.end();
         }else{
