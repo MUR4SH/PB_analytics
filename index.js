@@ -4,6 +4,7 @@ const client_http = require("http");
 const fs = require('fs');
 let html_s = fs.readFileSync('./server_page.html','utf-8')
 let html_c = fs.readFileSync('./client_page.html','utf-8')
+var ip = require("ip");
 
 const server = new server_i.Server({port:8080})
 
@@ -55,7 +56,7 @@ server_http.createServer(async function(req, res){
         res.end();
     }
 }).listen('8181',()=>{
-    console.log('SERVER http://127.0.0.1'+':'+'8181');
+    console.log('SERVER http://'+ip.address()+':'+'8181');
 });
 
 client_http.createServer(async function(req, res){
@@ -80,5 +81,5 @@ client_http.createServer(async function(req, res){
         }
     }
 }).listen('8383',()=>{
-    console.log('CLIENT http://127.0.0.1'+':'+'8383');
+    console.log('CLIENT http://'+ip.address()+':'+'8383');
 });
