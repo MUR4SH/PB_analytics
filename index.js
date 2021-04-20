@@ -69,7 +69,7 @@ client_http.createServer(async function(req, res){
             let photo;
             try{
                 photo = fs.readFileSync(url_photo)
-                let photo_type='jpg';
+                let photo_type='png';
                 console.log(req.url)
                 photo_type = req.url.match(/.[A-Za-z]+$/g)[0].replace('.','')
                 res.writeHead(200, {'Content-Type': `image/${photo_type}`});
