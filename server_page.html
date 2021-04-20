@@ -44,7 +44,9 @@
             <option value='Bo5'>Bo5</option>
         </select>
         <div id='pb_t_main'>
-            <div id='pb_ta'>Team Left<select id='map_a_1' onchange='change_chs()'></select><select id='map_a_2' onchange='change_chs()'></select><select id='map_a_3' onchange='change_chs()'></select><select id='map_a_4' onchange='change_chs()'></select><select id='map_a_5' onchange='change_chs()'></select><select id='map_a_6' onchange='change_chs()'></select><select id='map_a_7' onchange='change_chs()'></select>Team Right</div>
+            <div id='pb_ta'><select onchange='change_team(this)' id='teaml'></select>
+            <select id='map_a_1' onchange='change_chs()'></select><select id='map_a_2' onchange='change_chs()'></select><select id='map_a_3' onchange='change_chs()'></select><select id='map_a_4' onchange='change_chs()'></select><select id='map_a_5' onchange='change_chs()'></select><select id='map_a_6' onchange='change_chs()'></select><select id='map_a_7' onchange='change_chs()'></select>
+            <select onchange='change_team(this)' id='teamr'></select></div>
         </div>
         <div class='btn' onclick='set_lobby();'>Accept</div>
         <div class='btn' onclick='reload_lobby();'>Reload</div>
@@ -55,8 +57,28 @@
     
     let maps = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
     let maps_buf = ["de_dust2","de_mirage","de_nuke","de_inferno","de_train","de_overpass","de_vertigo"];
+    let teams_arr = ["ex-winstrike","ave","100pg","nemiga","1win","trident clan"]
+    let teams=[] //0-лево, 1-право
     let chms = [];
     
+    function change_team(elem){
+        if(elem.id == 'teaml'){
+            teams[0] = elem.value
+        }else{
+            teams[1] = elem.value
+        }
+    }
+
+        function teams_fill(){
+            let tms=`<option value="null"></option>`;
+            teams_arr.forEach((tm)=>{
+                tms+=`<option value="${tm}">${tm}</option>`
+            })
+            document.getElementById('teaml').innerHTML = tms;
+            document.getElementById('teamr').innerHTML = tms;
+        }
+        teams_fill()
+
     function change_gt(){
         switch(document.getElementById('gt').value){
             case 'Bo1':
@@ -136,7 +158,8 @@
         let gt = document.getElementById('gt').value
         let request = {
             maps: chms,
-            game_type: gt
+            game_type: gt,
+            teams:teams
         }
         socket.send(JSON.stringify(request))
     }
@@ -183,6 +206,9 @@ function reconnect(){
         change_chs()
         document.getElementById('gt').value = arr.game_type;
         change_gt()
+        teams = arr.teams
+        document.getElementById('teaml').value=teams[0]
+        document.getElementById('teamr').value=teams[1]
     }
 }
 reconnect()

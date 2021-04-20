@@ -19,23 +19,38 @@
     
 }
     .map_pb_obs{
-        border: 4px solid white;
+        border: 5px solid #548cc7;
         opacity:1;
-        width:148px;
+        width:147px;
         height:205px;
-        border-radius:15px;
-        margin-left:31px;
-        margin-right:31px;
+        /*border-radius:15px;*/
+        margin-right:56.5px;
         background: rgba(0,0,0,0.5);
         object-fit:cover;
     }
     #pb_rows_maps_last{
         padding-left:45px;
     }
+.team_img{
+    top:35px;
+    position: relative;
+    width:171px;
+    height:138px;
+    object-fit:contain;
+    transform:rotate3d(0,1,0,90deg);
+}
+.til{
+    left:34px;
+}
+.tir{
+    right:31px;
+}
 </style>
 <body>
-    <div style='display:flex;flex-direction:row;position: absolute;right: 0px;left: 0px;bottom: 0px;'>
-        <div id='pb_rows_maps_a' style='display:flex;flex-direction:row; margin-left: auto; margin-right: auto; width:auto; height:288px;'></div>
+    <div style='display:flex;flex-direction:row;position: absolute;right: 0px;left: 0px;bottom: 11px;'>
+        <img class='team_img til' id='teaml' />
+        <div id='pb_rows_maps_a' style='display:flex;flex-direction:row; margin-left: auto; margin-right: auto; width:1435px;'></div>
+        <img class='team_img tir' id='teamr' />
     </div>
 </body>
 <script>
@@ -55,6 +70,24 @@ function start(){
 }
 
 start();
+
+function teams_fill(teams){
+
+    if(teams[0]){
+        document.getElementById('teaml').setAttribute("src",`../teams/${teams[0]}.png`)
+        document.getElementById('teaml').style='transform:rotate3d(0,1,0,0deg); transition: transform 0.5s;';
+    }else{
+        document.getElementById('teaml').setAttribute("src",`null`)
+        document.getElementById('teaml').style='transform:rotate3d(0,1,0,90deg);';
+    }
+    if(teams[1]){
+        document.getElementById('teamr').setAttribute("src",`../teams/${teams[1]}.png`)
+        document.getElementById('teamr').style='transform:rotate3d(0,1,0,0deg); transition: transform 0.5s;';
+    }else{
+        document.getElementById('teamr').setAttribute("src",`null`)
+        document.getElementById('teamr').style='transform:rotate3d(0,1,0,90deg);';
+    }
+}
 
 function maps_check(arr_maps){
     let real=0
@@ -95,11 +128,15 @@ function reconnect(){
         }else{
             maps = [];
         }
+        let teams =[];
+        teams = arr.teams
+        teams_fill(teams)
+        if(maps.length ==0){maps[6]=null}
         gt = arr.game_type;
         switch(gt){
                     case 'Bo1':
                         for(let i=0;i<maps.length;i++){
-                            if(maps[i] != buf[i]){
+                            if(maps[i] != buf[i] && maps[i]){
                                 document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,-90deg); transition: transform 0.5s;';
                                 setTimeout(()=>{
                                     document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,90deg);';
@@ -115,11 +152,17 @@ function reconnect(){
                                 },500)
                                 buf[i]=maps[i]
                             }
+                            if(!maps[i]){
+                                document.getElementById((i+1)+'_obs').src = "../maps/back_card.png"
+                                document.getElementById((i+1)+'_obs_span').innerText = null;
+                                document.getElementById((i+1)+'_obs_span').style= null
+                                buf[i]=null
+                            }
                         }
                         break;
                     case 'Bo3':
                         for(let i=0;i<maps.length;i++){
-                            if(maps[i] != buf[i]){
+                            if(maps[i] != buf[i] && maps[i]){
                                 document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,-90deg); transition: transform 0.5s;';
                                 setTimeout(()=>{
                                     document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,90deg);';
@@ -135,11 +178,17 @@ function reconnect(){
                                 },500)
                                 buf[i]=maps[i]
                             }
+                            if(!maps[i]){
+                                document.getElementById('map_div_'+i).src = "../maps/back_card.png"
+                                document.getElementById((i+1)+'_obs_span').style= null
+                                document.getElementById((i+1)+'_obs_span').innerText = null;
+                                buf[i]=null
+                            }
                         }
                         break;
                     case 'Bo5':
                         for(let i=0;i<maps.length;i++){
-                            if(maps[i] != buf[i]){
+                            if(maps[i] != buf[i] && maps[i]){
                                 document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,-90deg); transition: transform 0.5s;';
                                 setTimeout(()=>{
                                     document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,90deg);';
@@ -154,6 +203,12 @@ function reconnect(){
                                     document.getElementById('map_div_'+i).style='transform:rotate3d(0,1,0,0deg); transition: transform 0.5s;';
                                 },500)
                                 buf[i]=maps[i]
+                            }
+                            if(!maps[i]){
+                                document.getElementById('map_div_'+i).src = "../maps/back_card.png"
+                                document.getElementById((i+1)+'_obs_span').style= null
+                                document.getElementById((i+1)+'_obs_span').innerText = null;
+                                buf[i]=null
                             }
                         }
                         break;

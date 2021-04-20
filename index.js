@@ -2,13 +2,14 @@ const server_i = require("ws");
 const server_http = require("http");
 const client_http = require("http");
 const fs = require('fs');
-let html_s = fs.readFileSync('./server_page.html','utf-8')
-let html_c = fs.readFileSync('./client_page.html','utf-8')
+
+
 var ip = require("ip");
 
 const server = new server_i.Server({port:8080})
 
 let maps=[];
+let teams=[];
 var clients = [];
 let gt='Bo1';
 
@@ -21,6 +22,7 @@ server.on('connection',(ws)=>{
         if(message == 'reload_lobby'){
             gt = 'Bo1'
             maps = []
+            teams=[]
         }else if(message != 'get_lobby_info'){
             try{
                 body = JSON.parse(message)
@@ -33,10 +35,14 @@ server.on('connection',(ws)=>{
             if(body.maps){
                 maps = body.maps
             }
+            if(body.teams){
+                teams  = body.teams
+            }
         }
         response = {
             game_type: gt,
-            maps: maps
+            maps: maps,
+            teams:teams
         }
         for (var key in clients) {
             clients[key].send(JSON.stringify(response));
@@ -50,6 +56,7 @@ server.on('connection',(ws)=>{
 
 server_http.createServer(async function(req, res){
     if(req.method == "GET"){
+        let html_s = fs.readFileSync('./server_page.html','utf-8')
         res.statusCode = 200;
         res.setHeader('Content-type', 'text/html');
         res.write(html_s)
@@ -61,6 +68,7 @@ server_http.createServer(async function(req, res){
 
 client_http.createServer(async function(req, res){
     if(req.method == "GET"){
+        let html_c = fs.readFileSync('./client_page.html','utf-8')
         if(!req.url.match(/.[A-Za-z]+$/g)){
             res.write(html_c)
             res.end();
