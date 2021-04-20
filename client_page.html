@@ -8,6 +8,7 @@
     position: relative;
     text-align: center;
     width: 171px;
+    height: 21px;
     top: -50px;
     background:radial-gradient(55.15% 528.85% at 50% 50%, green 0%, rgba(252, 85, 0, 0) 64.27%);
     color:white;
@@ -15,10 +16,16 @@
     padding-bottom:10px;
 }
 .map{
-    margin-right:56.5px;
+    margin-right: 42px;
     transform: rotate3d(0,1,0,0deg);
     transition: transform 1s;
-    
+}
+#pb_rows_maps_a{
+    display:flex;
+    flex-direction:row;
+    position: relative;
+    left: 74px;
+    width:1435px;
 }
     .map_pb_obs{
         border: 5px solid #548cc7;
@@ -33,26 +40,31 @@
         padding-left:45px;
     }
 .team_img{
-    display: block;
     top:35px;
     position: relative;
-    width:171px;
+    width:157px;
     height:138px;
     object-fit:contain;
     transform:rotate3d(0,1,0,90deg);
 }
+.img_div{
+    position:relative;
+    width:171px;
+    height:138px;
+    display: block;
+}
 .til{
-    left:34px;
+    left:39px;
 }
 .tir{
-    right:31px;
+    right:-60px;
 }
 </style>
 <body>
     <div style='display:flex;flex-direction:row;position: absolute;right: 0px;left: 0px;bottom: -9px;'>
-        <img class='team_img til' id='teaml' />
-        <div id='pb_rows_maps_a' style='display:flex;flex-direction:row; margin-left: auto; margin-right: auto; width:1435px;'></div>
-        <img class='team_img tir' id='teamr' />
+        <div class='img_div til'><img class='team_img' id='teaml' /></div>
+        <div id='pb_rows_maps_a'a></div>
+        <div class='img_div tir'><img class='team_img tir' id='teamr' /></div>
     </div>
 </body>
 <script>
