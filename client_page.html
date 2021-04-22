@@ -129,10 +129,10 @@ function maps_check(arr_maps){
 function reconnect(){
     socket = new WebSocket(url);
     socket.onclose = function(){
-        setTimeout(function(){reconnect(url)}, 1000);
+        setTimeout(function(){reconnect(url)}, 10000);
     };
     socket.onerror  = ()=>{
-        setTimeout(function(){reconnect(url)}, 1000);
+        setTimeout(function(){reconnect(url)}, 10000);
     }
     socket.onopen = ()=>{
         socket.send("get_lobby_info");

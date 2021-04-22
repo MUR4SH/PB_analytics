@@ -45,7 +45,7 @@
         </select>
         <div id='pb_t_main'>
             <div id='pb_ta'><select onchange='change_team(this)' id='teaml'></select>
-            <select id='map_a_1' onchange='change_chs()'></select><select id='map_a_2' onchange='change_chs()'></select><select id='map_a_3' onchange='change_chs()'></select><select id='map_a_4' onchange='change_chs()'></select><select id='map_a_5' onchange='change_chs()'></select><select id='map_a_6' onchange='change_chs()'></select><select id='map_a_7' onchange='change_chs()'></select>
+            <select id='map_a_1' onchange='change_chs(this)'></select><select id='map_a_2' onchange='change_chs(this)'></select><select id='map_a_3' onchange='change_chs(this)'></select><select id='map_a_4' onchange='change_chs(this)'></select><select id='map_a_5' onchange='change_chs(this)'></select><select id='map_a_6' onchange='change_chs(this)'></select><select id='map_a_7' onchange='change_chs(this)'></select>
             <select onchange='change_team(this)' id='teamr'></select></div>
         </div>
         <div class='btn' onclick='set_lobby();'>Accept</div>
@@ -133,25 +133,33 @@
         maps = mb
     }
 
-    function change_chs(){
-        let num=0;
-        for(let i=0;i<7;i++){
-            if(document.getElementById('map_a_'+(i+1)).value){
-                chms[i] = document.getElementById('map_a_'+(i+1)).value;
-                num++;
-                for(let j=0;j<maps.length;j++){
-                    if(maps[j] == chms[i] && chms[i]){
-                        maps[j] = null;
+    function change_chs(elem){
+        let num=elem.id.replace('map_a_','');
+        chms[num-1] = elem.value;
+        shift()/*
+        let top=0;
+        for(let j=0;j<=chms.length;j++){
+            if(chms[j]){
+                top++;
+            }
+        }
+        if(top == 6){
+            for(let i=1;i<=7;i++){
+                for(let j=0;j<=maps.length;j++){
+                    if(document.getElementById('map_a_'+i).value == maps[j]){
+                        maps[j] = null
+                        break;
                     }
                 }
             }
-        }
-        shift()
-        if(maps.length == 1){
-            document.getElementById('map_a_4').value = maps[0]
-            chms.push(maps[0]);
-        }
-        maps = maps_buf;
+            for(let j=0;j<=maps.length;j++){
+                if(maps[j]){
+                    document.getElementById('map_a_4').value=  maps[j]
+                    change_chs(document.getElementById('map_a_4'))
+                    break;
+                }
+            }
+        }*/
     }
     
     async function set_lobby(){
@@ -166,7 +174,7 @@
     
     function set_maps(){
         for(let j=0;j<7;j++){
-            let block=''
+            let block="<option></option>"
             for(let i=0;i<maps.length;i++){
                 block +="<option value='"+maps[i]+"'>"+maps[i]+"</option>";
             }
@@ -182,10 +190,10 @@
 function reconnect(){
     socket = new WebSocket(url);
     socket.onclose = function(){
-        setTimeout(function(){reconnect(url)}, 1000);
+        setTimeout(function(){reconnect(url)}, 10000);
     };
     socket.onerror  = ()=>{
-        setTimeout(function(){reconnect(url)}, 1000);
+        setTimeout(function(){reconnect(url)}, 10000);
     }
     socket.onopen = ()=>{
         socket.send("get_lobby_info");
@@ -203,13 +211,18 @@ function reconnect(){
             if(chms[5])document.getElementById('map_a_6').value=chms[5];
             if(chms[6])document.getElementById('map_a_7').value=chms[6];
         }
-        change_chs()
+        ch_chs_all()
         document.getElementById('gt').value = arr.game_type;
         change_gt()
         teams = arr.teams
         document.getElementById('teaml').value=teams[0]
         document.getElementById('teamr').value=teams[1]
     }
+}
+function ch_chs_all(){
+    for(let i=1;i<=7;i++){
+        change_chs(document.getElementById('map_a_'+i))
+    }   
 }
 reconnect()
 </script>
