@@ -200,7 +200,8 @@ function reconnect(){
                                 buf[i]=maps[i]
                             }
                             if(!maps[i]){
-                                document.getElementById('map_div_'+i).src = "../maps/back_card.png"
+                                console.log()
+                                document.getElementById((i+1)+'_obs').src = "../maps/back_card.png"
                                 document.getElementById((i+1)+'_obs_span').style= null
                                 document.getElementById((i+1)+'_obs_span').innerText = null;
                                 buf[i]=null
@@ -226,7 +227,7 @@ function reconnect(){
                                 buf[i]=maps[i]
                             }
                             if(!maps[i]){
-                                document.getElementById('map_div_'+i).src = "../maps/back_card.png"
+                                document.getElementById((i+1)+'_obs').src = "../maps/back_card.png"
                                 document.getElementById((i+1)+'_obs_span').style= null
                                 document.getElementById((i+1)+'_obs_span').innerText = null;
                                 buf[i]=null

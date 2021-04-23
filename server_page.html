@@ -136,30 +136,7 @@
     function change_chs(elem){
         let num=elem.id.replace('map_a_','');
         chms[num-1] = elem.value;
-        shift()/*
-        let top=0;
-        for(let j=0;j<=chms.length;j++){
-            if(chms[j]){
-                top++;
-            }
-        }
-        if(top == 6){
-            for(let i=1;i<=7;i++){
-                for(let j=0;j<=maps.length;j++){
-                    if(document.getElementById('map_a_'+i).value == maps[j]){
-                        maps[j] = null
-                        break;
-                    }
-                }
-            }
-            for(let j=0;j<=maps.length;j++){
-                if(maps[j]){
-                    document.getElementById('map_a_4').value=  maps[j]
-                    change_chs(document.getElementById('map_a_4'))
-                    break;
-                }
-            }
-        }*/
+        shift()
     }
     
     async function set_lobby(){
