@@ -134,8 +134,12 @@
     }
 
     function change_chs(elem){
-        let num=elem.id.replace('map_a_','');
-        chms[num-1] = elem.value;
+        let num=Number(elem.id.replace('map_a_',''));
+        if(elem.value!='null'){
+            chms[num-1] = elem.value;
+        }else{
+            chms[num-1] = null;
+        }
         shift()
     }
     
@@ -152,7 +156,7 @@
     
     function set_maps(){
         for(let j=0;j<7;j++){
-            let block="<option></option>"
+            let block="<option value='null'></option>"
             for(let i=0;i<maps.length;i++){
                 block +="<option value='"+maps[i]+"'>"+maps[i]+"</option>";
             }
