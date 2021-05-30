@@ -48,8 +48,8 @@
             <select id='map_a_1' onchange='change_chs(this)'></select><select id='map_a_2' onchange='change_chs(this)'></select><select id='map_a_3' onchange='change_chs(this)'></select><select id='map_a_4' onchange='change_chs(this)'></select><select id='map_a_5' onchange='change_chs(this)'></select><select id='map_a_6' onchange='change_chs(this)'></select><select id='map_a_7' onchange='change_chs(this)'></select>
             <select onchange='change_team(this)' id='teamr'></select></div>
         </div>
-        <div class='btn' onclick='set_lobby();'>Accept</div>
-        <div class='btn' onclick='reload_lobby();'>Reload</div>
+        <div class='btn' id='btn_accept' onclick='set_lobby();'>Accept</div>
+        <div class='btn' id='btn_close' onclick='reload_lobby();'>Reload</div>
     </body>
     <script>
     let url = 'ws://'+window.location.origin.replace('http://','').replace('https://','').replace(/\:\d+$/g,':8080')
@@ -146,7 +146,8 @@
             game_type: gt,
             teams:teams
         }
-        socket.send(JSON.stringify(request))
+        sendData(JSON.stringify(request))
+       // socket.send(JSON.stringify(request))
     }
     
     function set_maps(){
@@ -162,7 +163,15 @@
     set_maps();
 
 
-
+function sendData(data) {
+    if(!socket.readyState){
+        setTimeout(function (){
+            sendData(data);
+        },100);
+    }else{
+        socket.send(data);
+    }
+};
 
 function reconnect(){
     socket = new WebSocket(url);
@@ -173,7 +182,8 @@ function reconnect(){
         setTimeout(function(){reconnect(url)}, 10000);
     }
     socket.onopen = ()=>{
-        socket.send("get_lobby_info");
+        //socket.send("get_lobby_info");
+        sendData("get_lobby_info")
     }
     socket.onmessage = (event)=>{
         let message = event.data;

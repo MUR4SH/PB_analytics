@@ -7,6 +7,10 @@ const fs = require('fs');
 var ip = require("ip");
 
 const server = new server_i.Server({port:8080})
+/*
+8080 - Вебсокет
+8181 - Рабочая страница (Server)
+8383 - Отображаемая страница (Client)*/
 
 let maps=[];
 let teams=[];
